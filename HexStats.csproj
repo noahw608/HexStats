@@ -24,8 +24,4 @@
         <None Include="Src\appsettings.*.json" CopyToOutputDirectory="PreserveNewest" Link="appsettings.*.json" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Src\Configuration\" />
-    </ItemGroup>
-
 </Project>

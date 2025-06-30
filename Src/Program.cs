@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using HexStats.Configuration;
 using HexStats.Services;
 using Serilog;
 using Microsoft.Extensions.Configuration;
@@ -31,8 +32,11 @@ class Program
             .UseSerilog()
             .ConfigureServices((context, services) =>
             {
-                services.AddTransient<IApplicationService, ApplicationService>();
+                
+                services.Configure<DiscordConfiguration>(context.Configuration.GetSection("Discord"));
+                
                 services.AddSingleton<IDiscordService, DiscordService>();
+                services.AddSingleton<IApplicationService, ApplicationService>();
             })
             .Build();
         
@@ -48,6 +52,11 @@ class Program
                 Log.Fatal(ex, "Application terminated unexpectedly");
                 throw;
             }
+            finally
+            {
+                await host.StopAsync();
+            }
         }
+        
     }
 }

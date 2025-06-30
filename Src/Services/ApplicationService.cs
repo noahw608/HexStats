@@ -7,12 +7,14 @@ namespace HexStats.Services;
 public class ApplicationService : IApplicationService
 {
     private readonly ILogger<ApplicationService> _logger;
-    private static readonly DiscordSocketClient _discordClient;
+    private readonly IDiscordService _discordService;
 
-    public ApplicationService(ILogger<ApplicationService> logger)
+    public ApplicationService(ILogger<ApplicationService> logger, IDiscordService discordService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _logger.LogInformation("Logger initialized for ApplicationService");
+        _discordService = discordService ?? throw new ArgumentNullException(nameof(discordService));
+        _logger.LogInformation("DiscordService initialized for ApplicationService");
     }
 
     public async Task RunAsync()
@@ -21,12 +23,43 @@ public class ApplicationService : IApplicationService
 
         try
         {
+            _discordService.Ready += OnDiscordReady;
+            _discordService.MessageReceived += OnMessageReceived;
+            
+            await _discordService.StartAsync();
+            
+            _logger.LogInformation("Application started successfully. Press Ctrl+C to stop.");
+
+            await _discordService.WaitForReadyAsync();
+
+            await _discordService.SendMessageAsync(1385699889224351925, "Hello from my application.");
+            
+            await Task.Delay(-1);
+            
             _logger.LogInformation("Application completed successfully");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred during application execution");
             throw;
+        }
+    }
+    
+    private Task OnDiscordReady()
+    {
+        _logger.LogInformation("Discord bot is ready and connected!");
+        return Task.CompletedTask;
+    }
+
+    private async Task OnMessageReceived(SocketMessage message)
+    {
+        if (message.Content.StartsWith("!hello"))
+        {
+            await _discordService.SendMessageAsync(message.Channel.Id, $"Hello {message.Author.Mention}!");
+        }
+        else if (message.Content.StartsWith("!ping"))
+        {
+            await _discordService.SendMessageAsync(message.Channel.Id, "Pong!");
         }
     }
 }
