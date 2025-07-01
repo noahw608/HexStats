@@ -12,14 +12,15 @@ public class DiscordService : IDiscordService
     private readonly DiscordSocketClient _discordClient;
     private readonly DiscordConfiguration _config;
     private readonly TaskCompletionSource<bool> _readyTaskCompletionSource;
+    private readonly IInteractionFrameworkService _interactionFrameworkService;
 
-    public DiscordService(ILogger<DiscordService> logger, IOptions<DiscordConfiguration> config)
+    public DiscordService(ILogger<DiscordService> logger, IOptions<DiscordConfiguration> config, IInteractionFrameworkService interactionFrameworkService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _config = config.Value ?? throw new ArgumentNullException(nameof(config));
         _readyTaskCompletionSource = new TaskCompletionSource<bool>();
         
-var intents = ParseIntents(_config.Intents);
+        var intents = ParseIntents(_config.Intents);
 
         var token = Environment.GetEnvironmentVariable("DISCORD_TOKEN");
         if (string.IsNullOrEmpty(token))
@@ -37,7 +38,12 @@ var intents = ParseIntents(_config.Intents);
         _discordClient.Log += LogAsync;
         _discordClient.Ready += OnReadyAsync;
         _discordClient.MessageReceived += OnMessageReceivedAsync;
+        
+        _interactionFrameworkService = interactionFrameworkService ?? throw new ArgumentNullException(nameof(interactionFrameworkService));
     }
+    
+    public DiscordSocketClient Client => _discordClient;
+    public DiscordConfiguration Config => _config;
     
     public async Task StartAsync(CancellationToken cancellationToken = default)
     {
@@ -136,7 +142,12 @@ var intents = ParseIntents(_config.Intents);
         _logger.LogInformation("Discord bot is ready! Logged in as {Username}#{Discriminator}", 
             _discordClient.CurrentUser.Username, _discordClient.CurrentUser.Discriminator);
         
-        await ListAvailableChannelsAsync();
+        // List all available channels for debugging
+        // await ListAvailableChannelsAsync();
+        
+        await _interactionFrameworkService.RegisterCommandsAsync();
+        _logger.LogInformation("Commands registered.");
+
 
         _readyTaskCompletionSource.TrySetResult(true);
         

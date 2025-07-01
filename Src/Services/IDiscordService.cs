@@ -1,9 +1,12 @@
 using Discord.WebSocket;
+using HexStats.Configuration;
 
 namespace HexStats.Services;
 
 public interface IDiscordService
 {
+    Discord.WebSocket.DiscordSocketClient Client { get; }
+    DiscordConfiguration Config { get; }
     Task StartAsync(CancellationToken cancellationToken = default);
     Task StopAsync(CancellationToken cancellationToken = default);
     Task WaitForReadyAsync(TimeSpan? timeout = null);

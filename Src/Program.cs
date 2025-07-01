@@ -36,6 +36,7 @@ class Program
                 services.Configure<DiscordConfiguration>(context.Configuration.GetSection("Discord"));
                 
                 services.AddSingleton<IDiscordService, DiscordService>();
+                services.AddSingleton<IInteractionFrameworkService, InteractionFrameworkService>();
                 services.AddSingleton<IApplicationService, ApplicationService>();
             })
             .Build();
