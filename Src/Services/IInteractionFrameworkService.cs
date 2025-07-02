@@ -9,4 +9,5 @@ public interface IInteractionFrameworkService
     Task RegisterCommandsAsync(bool isGlobal = true);
     Task HandleInteractionAsync(SocketInteraction interaction);
     Task AddModulesAsync(Assembly assembly);
+    Task OnDiscordReadyAsync();
 }

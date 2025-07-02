@@ -27,6 +27,9 @@ public class InteractionFrameworkService : IInteractionFrameworkService
             LogLevel = LogSeverity.Info
         });
         _services = services;
+        
+        // Subscribe to Discord Ready event to initialize and register commands
+        discordService.Ready += OnDiscordReadyAsync;
     }
 
     public async Task InitializeAsync()
@@ -49,7 +52,7 @@ public class InteractionFrameworkService : IInteractionFrameworkService
         }
         else
         {
-            await _interactionService.RegisterCommandsToGuildAsync(_discordConfig.Guilds[0].GuildId); // Add more verbose checking if needed
+            await _interactionService.RegisterCommandsToGuildAsync(_discordConfig.GuildId); // Add more verbose checking if needed
         }
     }
 
@@ -73,5 +76,19 @@ public class InteractionFrameworkService : IInteractionFrameworkService
     public async Task AddModulesAsync(Assembly assembly)
     {
         await _interactionService.AddModulesAsync(assembly, _services);
+    }
+
+    public async Task OnDiscordReadyAsync()
+    {
+        try
+        {
+            await InitializeAsync();
+            await RegisterCommandsAsync(false);
+            _logger.LogInformation("Interaction framework initialized and commands registered successfully.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to initialize interaction framework or register commands.");
+        }
     }
 }

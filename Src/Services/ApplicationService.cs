@@ -8,13 +8,16 @@ public class ApplicationService : IApplicationService
 {
     private readonly ILogger<ApplicationService> _logger;
     private readonly IDiscordService _discordService;
+    private readonly IInteractionFrameworkService _interactionFrameworkService;
 
-    public ApplicationService(ILogger<ApplicationService> logger, IDiscordService discordService)
+    public ApplicationService(ILogger<ApplicationService> logger, IDiscordService discordService, IInteractionFrameworkService interactionFrameworkService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _logger.LogInformation("Logger initialized for ApplicationService");
         _discordService = discordService ?? throw new ArgumentNullException(nameof(discordService));
         _logger.LogInformation("DiscordService initialized for ApplicationService");
+        _interactionFrameworkService = interactionFrameworkService ?? throw new ArgumentNullException(nameof(interactionFrameworkService));
+        _logger.LogInformation("InteractionFrameworkService initialized for ApplicationService");
     }
 
     public async Task RunAsync()
@@ -23,6 +26,7 @@ public class ApplicationService : IApplicationService
 
         try
         {
+            
             _discordService.Ready += OnDiscordReady;
             _discordService.MessageReceived += OnMessageReceived;
             
@@ -32,7 +36,7 @@ public class ApplicationService : IApplicationService
 
             await _discordService.WaitForReadyAsync();
 
-            await _discordService.SendMessageAsync(1385699889224351925, "Hello from my application.");
+            await _discordService.SendMessageAsync(_discordService.Config.ChannelId , "Hello from my application.");
             
             await Task.Delay(-1);
             
