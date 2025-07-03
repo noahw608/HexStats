@@ -40,28 +40,8 @@ public class DiscordService : IDiscordService
     {
         _logger.LogInformation("Starting Discord service...");
         
-        // Get token from environment variable first, fall back to configuration if needed
-        var token = Environment.GetEnvironmentVariable("DISCORD_TOKEN");
         
-        // If environment variable is not set, try to use configuration token
-        if (string.IsNullOrEmpty(token))
-        {
-            token = _config.Token;
-            _logger.LogInformation("Using Discord token from configuration (consider using DISCORD_TOKEN environment variable)");
-        }
-        else
-        {
-            _logger.LogInformation("Using Discord token from DISCORD_TOKEN environment variable");
-        }
-        
-        // Validate that we have a token from either source
-        if (string.IsNullOrEmpty(token) || token == "YOUR_BOT_TOKEN_HERE" || token == "${DISCORD_TOKEN}")
-        {
-            _logger.LogError("Discord bot token is not configured. Set DISCORD_TOKEN environment variable or Discord:Token configuration.");
-            throw new InvalidOperationException("Discord bot token is not configured");
-        }
-        
-        await _discordClient.LoginAsync(TokenType.Bot, token);
+        await _discordClient.LoginAsync(TokenType.Bot, _config.Token);
         await _discordClient.StartAsync();
         
         _logger.LogInformation("Discord service started successfully");

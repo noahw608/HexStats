@@ -1,7 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using HexStats.Configuration;
+using HexStats.Data;
+using HexStats.Repositories;
 using HexStats.Services;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,10 +35,19 @@ class Program
             .UseSerilog()
             .ConfigureServices((context, services) =>
             {
+                services.AddDbContext<AppDbContext>(options => options.UseSqlite(context.Configuration.GetConnectionString("DefaultConnection")));
+                services.AddScoped<IUserRepository, UserRepository>();
+                
                 
                 services.Configure<DiscordConfiguration>(context.Configuration.GetSection("Discord"));
-                
+                services.PostConfigure<DiscordConfiguration>(config =>
+                {
+                    config.Token = Environment.GetEnvironmentVariable("DISCORD_TOKEN")
+                                   ?? throw new InvalidOperationException("DISCORD_TOKEN environment variable is not set");
+                });
+
                 services.AddSingleton<IDiscordService, DiscordService>();
+                
                 services.AddSingleton<IInteractionFrameworkService, InteractionFrameworkService>();
                 services.AddSingleton<IApplicationService, ApplicationService>();
             })
@@ -45,6 +57,10 @@ class Program
         {
             try
             {
+                using var scope = host.Services.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                await dbContext.Database.MigrateAsync();
+                
                 var app = host.Services.GetRequiredService<IApplicationService>();
                 await app.RunAsync();
             }
