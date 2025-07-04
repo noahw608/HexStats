@@ -1,7 +1,7 @@
 using System.Reflection;
 using Discord.WebSocket;
 
-namespace HexStats.Services;
+namespace HexStats.Services.Interfaces;
 
 public interface IInteractionFrameworkService
 {

@@ -2,16 +2,20 @@ namespace HexStats.Enums;
 
 public enum GameRegion
 {
-    NA, // North America
-    EUW, // Europe West
-    EUNE, // Europe Nordic & East
-    KR, // Korea
-    CN, // China
-    SEA, // Southeast Asia
-    BR, // Brazil
-    LAN, // Latin America North
-    LAS, // Latin America South
-    OCE, // Oceania
-    TR, // Turkey
-    JP // Japan
+    BR1,
+    EUN1,
+    EUW1,
+    JP1,
+    KR,
+    LA1,
+    LA2,
+    NA1,
+    OC1,
+    TR1,
+    RU,
+    PH2,
+    SG2,
+    TH2,
+    TW2,
+    VN2
 }

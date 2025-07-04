@@ -1,4 +1,4 @@
-namespace HexStats.Services;
+namespace HexStats.Services.Interfaces;
 
 public interface IApplicationService
 {

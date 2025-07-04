@@ -1,7 +1,7 @@
 using Discord.WebSocket;
 using HexStats.Configuration;
 
-namespace HexStats.Services;
+namespace HexStats.Services.Interfaces;
 
 public interface IDiscordService
 {

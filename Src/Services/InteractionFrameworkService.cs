@@ -3,6 +3,7 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using HexStats.Configuration;
+using HexStats.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Serilog;
 

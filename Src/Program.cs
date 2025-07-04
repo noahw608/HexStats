@@ -4,6 +4,7 @@ using HexStats.Configuration;
 using HexStats.Data;
 using HexStats.Repositories;
 using HexStats.Services;
+using HexStats.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Microsoft.Extensions.Configuration;
@@ -45,8 +46,15 @@ class Program
                     config.Token = Environment.GetEnvironmentVariable("DISCORD_TOKEN")
                                    ?? throw new InvalidOperationException("DISCORD_TOKEN environment variable is not set");
                 });
-
                 services.AddSingleton<IDiscordService, DiscordService>();
+                
+                services.Configure<LeagueConfig>(context.Configuration.GetSection("League"));
+                services.PostConfigure<LeagueConfig>(config =>
+                {
+                    config.Key = Environment.GetEnvironmentVariable("LEAGUE_KEY")
+                                    ?? throw new InvalidOperationException("LEAGUE_KEY environment variable is not set");
+                });
+                services.AddSingleton<ILeagueService, LeagueService>();
                 
                 services.AddSingleton<IInteractionFrameworkService, InteractionFrameworkService>();
                 services.AddSingleton<IApplicationService, ApplicationService>();

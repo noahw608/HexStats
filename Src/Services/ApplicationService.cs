@@ -1,4 +1,5 @@
 using Discord.WebSocket;
+using HexStats.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
