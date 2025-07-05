@@ -17,8 +17,7 @@ public class UserRepository : IUserRepository
     
     public async Task<List<User>> GetAllUsersAsync()
     {
-        return await _dbContext.Users.ToListAsync()
-            ?? throw new KeyNotFoundException("No users found in the database.");
+        return await _dbContext.Users.ToListAsync();
     }
 
     public async Task<User?> GetUserByIdAsync(int userId)
@@ -34,7 +33,7 @@ public class UserRepository : IUserRepository
             ?? throw new KeyNotFoundException("User not found with the specified Discord username and discriminator.");
     }
 
-    public async Task<User> GetUserByLeagueUsernameAsync(string leagueUsername, string leagueTagline, GameRegion region)
+    public async Task<User?> GetUserByLeagueUsernameAsync(string leagueUsername, string leagueTagline, GameRegion region)
     {
         return await _dbContext.Users.FirstOrDefaultAsync(u =>
             u.LeagueUsername == leagueUsername && 
@@ -77,8 +76,21 @@ public class UserRepository : IUserRepository
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<bool> UserExistsAsync(int userId)
+    public async Task<bool> UserExistsByIdAsync(int userId)
     {
         return await _dbContext.Users.AnyAsync(u => u.Id == userId);
+    }
+    
+    public async Task<bool> UserExistsByLeagueUsernameAsync(string leagueUsername, string leagueTagline, GameRegion region)
+    {
+        return await _dbContext.Users.AnyAsync(u => 
+            u.LeagueUsername == leagueUsername && 
+            u.LeagueTagline == leagueTagline && 
+            u.LeagueGameRegion == region);
+    }
+    
+    public async Task<bool> UserExistsByDiscordUsernameAsync(string discordUsername)
+    {
+        return await _dbContext.Users.AnyAsync(u => u.DiscordUsername == discordUsername);
     }
 }

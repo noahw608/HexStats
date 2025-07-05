@@ -13,24 +13,26 @@ public class LeagueService : ILeagueService
 {
  
     private readonly ILogger<LeagueService> _logger;
-    private readonly LeagueConfig _config;
+    private readonly LeagueConfiguration _configuration;
     private readonly HttpClient _httpClient;
     
     
-    public LeagueService(IOptions<LeagueConfig> config, ILogger<LeagueService> logger)
+    public LeagueService(IOptions<LeagueConfiguration> config, ILogger<LeagueService> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _config = config.Value ?? throw new ArgumentNullException(nameof(config));
+        _configuration = config.Value ?? throw new ArgumentNullException(nameof(config));
         
         _httpClient = new HttpClient();
     }
+    
+    public LeagueConfiguration Configuration => _configuration;
     
     public async Task<AccountDto> GetRiotAccountByLeagueNameAsync(string leagueName, string tagLine, AccountRegion accountRegion,
         CancellationToken cancellationToken = default)
     {
 
         string url =
-            $"https://{accountRegion}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{leagueName}/{tagLine}?api_key={_config.Key}";
+            $"https://{accountRegion}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{leagueName}/{tagLine}?api_key={_configuration.Key}";
         var response = await _httpClient.GetAsync(url, cancellationToken);
 
         if (response.IsSuccessStatusCode == false)
@@ -56,7 +58,7 @@ public class LeagueService : ILeagueService
     public async Task<SummonerDto> GetSummonerByPuuidAsync(string puuid, GameRegion gameRegion, CancellationToken cancellationToken = default)
     {
         string url =
-            $"https://{gameRegion}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={_config.Key}";
+            $"https://{gameRegion}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={_configuration.Key}";
         var response = await _httpClient.GetAsync(url, cancellationToken);
         
         if (response.IsSuccessStatusCode == false)

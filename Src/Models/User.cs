@@ -9,4 +9,6 @@ public class User
     public string LeagueUsername { get; set; } = string.Empty;
     public string LeagueTagline { get; set; } = string.Empty;
     public GameRegion LeagueGameRegion { get; set; }
+    public int SummonerIconId { get; set; }
+    public int SummonerLevel { get; set; }
 }

@@ -8,9 +8,11 @@ public interface IUserRepository
     Task<List<User>> GetAllUsersAsync();
     Task<User?> GetUserByIdAsync(int userId);
     Task<User?> GetUserByDiscordUsernameAsync(string discordUsername);
-    Task<User> GetUserByLeagueUsernameAsync(string leagueUsername, string leagueTagline, GameRegion region);
+    Task<User?> GetUserByLeagueUsernameAsync(string leagueUsername, string leagueTagline, GameRegion region);
     Task AddUserAsync(User user);
     Task UpdateUserAsync(User user);
     Task DeleteUserAsync(int userId);
-    Task<bool> UserExistsAsync(int userId);
+    Task<bool> UserExistsByIdAsync(int userId);
+    Task<bool> UserExistsByLeagueUsernameAsync(string leagueUsername, string leagueTagline, GameRegion region);
+    Task<bool> UserExistsByDiscordUsernameAsync(string discordUsername);
 }

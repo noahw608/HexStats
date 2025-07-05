@@ -48,8 +48,8 @@ class Program
                 });
                 services.AddSingleton<IDiscordService, DiscordService>();
                 
-                services.Configure<LeagueConfig>(context.Configuration.GetSection("League"));
-                services.PostConfigure<LeagueConfig>(config =>
+                services.Configure<LeagueConfiguration>(context.Configuration.GetSection("League"));
+                services.PostConfigure<LeagueConfiguration>(config =>
                 {
                     config.Key = Environment.GetEnvironmentVariable("LEAGUE_KEY")
                                     ?? throw new InvalidOperationException("LEAGUE_KEY environment variable is not set");
