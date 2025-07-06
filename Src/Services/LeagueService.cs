@@ -1,8 +1,10 @@
+using System.Net;
 using System.Text.Json;
 using Discord;
 using HexStats.Configuration;
 using HexStats.Dto.League;
 using HexStats.Enums;
+using HexStats.Models;
 using HexStats.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -79,6 +81,61 @@ public class LeagueService : ILeagueService
         }
         
         return summonerDto;
+    }
+
+    public async Task<CurrentGameInfoDto?> GetCurrentGameByPuuidAsync(string puuid, GameRegion gameRegion,
+        CancellationToken cancellationToken = default)
+    {
+        string url =
+            $"https://{gameRegion}.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/{puuid}%3A?api_key={_configuration.Key}";
+        var response = await _httpClient.GetAsync(url, cancellationToken);
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+        {
+            // No current game found for the given PUUID
+            _logger.LogInformation("No current game found for PUUID {Puuid} in region {Region}.",
+                puuid, gameRegion);
+            return null;
+        }
+        
+        if (response.IsSuccessStatusCode == false)
+        {
+            // Other error occurred
+            _logger.LogError("Failed to retrieve current game information for PUUID {Puuid} from {Region}. Status code: {StatusCode}",
+                puuid, gameRegion, response.StatusCode);
+            throw new HttpRequestException($"Failed to retrieve current game information: {response.ReasonPhrase}");
+        }
+        
+        var result = await response.Content.ReadAsStringAsync(cancellationToken);
+        var currentGameInfoDto = JsonSerializer.Deserialize<CurrentGameInfoDto>(result);
+        
+        if (currentGameInfoDto == null)
+        {
+            _logger.LogError("Failed to deserialize current game information for PUUID {Puuid} from {Region}. Response: {Response}",
+                puuid, gameRegion, result);
+            throw new JsonException("Failed to deserialize current game information");
+        }
+        
+        return currentGameInfoDto;
+    }
+
+    public async Task<Dictionary<CurrentGameInfoDto, User>> GetCurrentGamesByPuuidAsync(
+        List<User> users, CancellationToken cancellationToken = default)
+    {
+        Dictionary<CurrentGameInfoDto, User> currentGames = new Dictionary<CurrentGameInfoDto, User>();
+        
+        foreach (var user in users)
+        {
+            CurrentGameInfoDto? game =
+                await GetCurrentGameByPuuidAsync(user.Puuid, user.LeagueGameRegion, cancellationToken);
+
+            if (game != null)
+            {
+                currentGames.Add(game, user);
+            }
+            await Task.Delay(1000, cancellationToken); // Rate limiting
+        }
+        return currentGames;
     }
     
     public static AccountRegion MapGameRegionToAccountRegion(GameRegion gameRegion)

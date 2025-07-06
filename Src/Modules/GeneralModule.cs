@@ -123,6 +123,7 @@ public class GeneralModule: InteractionModuleBase<SocketInteractionContext>
             LeagueUsername = username,
             LeagueTagline = tagline,
             LeagueGameRegion = gameRegion,
+            Puuid = summonerDto.puuid,
             SummonerIconId = summonerDto.profileIconId,
             SummonerLevel = summonerDto.summonerLevel
         });
@@ -173,23 +174,7 @@ public class GeneralModule: InteractionModuleBase<SocketInteractionContext>
             return;
         }
         
-        EmbedFieldBuilder[] fields = new EmbedFieldBuilder[users.Count];
-        for (int i = 0; i < users.Count; i++)
-        {
-            User user = users[i];
-            fields[i] = new EmbedFieldBuilder()
-                .WithValue($"Summoner Username: {user.LeagueUsername}#{user.LeagueTagline} ({user.LeagueGameRegion})\nSummoner Level: {user.SummonerLevel}")
-                .WithName($"{user.DiscordUsername}")
-                .WithIsInline(false);
-        }
-        
-        Embed embed = new EmbedBuilder()
-            .WithTitle("Registered Users")
-            .WithColor(StandardColor)
-            .WithFields(fields)
-            .Build();
-        
-        await RespondAsync(embed: embed, ephemeral: false);
+        await RespondAsync(embed: CreateListEmbed(users), ephemeral: false);
         
     }
     
@@ -219,6 +204,25 @@ public class GeneralModule: InteractionModuleBase<SocketInteractionContext>
             .WithColor(StandardColor)
             .WithDescription(
                 $"**{discordUsername}** has linked summoner **{leagueUsername}#{leagueTagLine}** in HexStats.")
+            .Build();
+    }
+    
+    public static Embed CreateListEmbed(List<User> users)
+    {
+        EmbedFieldBuilder[] fields = new EmbedFieldBuilder[users.Count];
+        for (int i = 0; i < users.Count; i++)
+        {
+            User user = users[i];
+            fields[i] = new EmbedFieldBuilder()
+                .WithValue($"Summoner Username: {user.LeagueUsername}#{user.LeagueTagline} ({user.LeagueGameRegion})")
+                .WithName($"{user.DiscordUsername}")
+                .WithIsInline(false);
+        }
+        
+        return new EmbedBuilder()
+            .WithTitle("Registered Users")
+            .WithColor(StandardColor)
+            .WithFields(fields)
             .Build();
     }
     

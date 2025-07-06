@@ -41,6 +41,12 @@ public class UserRepository : IUserRepository
             u.LeagueGameRegion == region) 
             ?? throw new KeyNotFoundException("User not found with the specified League username, tagline, and region.");
     }
+    
+    public async Task<User?> GetUserByPuuidAsync(string puuid)
+    {
+        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Puuid == puuid)
+            ?? throw new KeyNotFoundException("User not found with the specified PUUID.");
+    }
 
     public async Task AddUserAsync(User user)
     {

@@ -1,6 +1,7 @@
 using HexStats.Configuration;
 using HexStats.Dto.League;
 using HexStats.Enums;
+using HexStats.Models;
 
 namespace HexStats.Services.Interfaces;
 
@@ -13,5 +14,7 @@ public interface ILeagueService
     
     Task<SummonerDto> GetSummonerByPuuidAsync(string puuid, GameRegion gameRegion, CancellationToken cancellationToken = default);
     
-    // Task<CurrentGameDto> GetCurrentGameByPuuidAsync(string puuid, GameRegion gameRegion, CancellationToken cancellationToken = default);
+    Task<CurrentGameInfoDto?> GetCurrentGameByPuuidAsync(string puuid, GameRegion gameRegion, CancellationToken cancellationToken = default);
+    
+    Task<Dictionary<CurrentGameInfoDto, User>> GetCurrentGamesByPuuidAsync(List<User> users, CancellationToken cancellationToken = default);
 }

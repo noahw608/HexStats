@@ -9,6 +9,7 @@ public interface IUserRepository
     Task<User?> GetUserByIdAsync(int userId);
     Task<User?> GetUserByDiscordUsernameAsync(string discordUsername);
     Task<User?> GetUserByLeagueUsernameAsync(string leagueUsername, string leagueTagline, GameRegion region);
+    Task<User?> GetUserByPuuidAsync(string puuid);
     Task AddUserAsync(User user);
     Task UpdateUserAsync(User user);
     Task DeleteUserAsync(int userId);
